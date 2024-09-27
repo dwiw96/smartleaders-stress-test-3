@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="/web/src/app.js"></script>
+</head>
+<body>
+    <form id="form">
+        <div class="container">
+          <h1>Movies Rented</h1>
+          <p>Please fill in this form to rent a movie</p>
+          <hr>
+      
+          <label for="fullname"><b>Fullname</b></label>
+          <input type="text" placeholder="Enter Fullname" name="fullname" id="fullname" required>
+      
+          <label for="address"><b>Physical Address</b></label>
+          <input type="text" placeholder="Enter Physical Address" name="address" id="address" required>
+      
+          <label for="movie"><b>Movies Rented</b></label>
+          <input type="text" placeholder="Enter Movie Rented" name="movie" id="movie" required>
+
+          <label for="salutation"><b>Salutation</b></label>
+          <input type="text" placeholder="Enter Salutation" name="salutation" id="salutation" required>
+          <hr>
+      
+          <button type="submit" class="registerbtn">Enter</button>
+        </div>
+      
+    </form>
+
+    <div class="container_2"></div>
+        <button id="goToTable" class="tablebtn">Rented Books List</button>
+    </div>
+
+    <script>
+        document.getElementById('goToTable').addEventListener('click', async function() {
+            try {
+                // Fetch data from the API
+                const response = await fetch('http://localhost:8080/api/list_of_rented_books');
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+
+                // Check if the result is success and value is present
+                if (data.result === 'success' && data.value) {
+                    // Save the data in localStorage for use in table.html
+                    localStorage.setItem('rentedBooks', JSON.stringify(data.value));
+
+                    // Redirect to table.html
+                    window.location.href = 'table.html';
+                } else {
+                    alert('Failed to fetch rented books data');
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                alert('Error fetching rented books');
+            }
+        });
+    </script>
+</body>
+</html>

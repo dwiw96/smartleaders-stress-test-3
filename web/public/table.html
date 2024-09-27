@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rented Books Table</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Rented Movies List</h1>
+        <table id="rentedBooksTable" border="1">
+            <thead>
+                <tr>
+                    <th>Fullname</th>
+                    <th>Physical Address</th>
+                    <th>Movies Rented</th>
+                    <th>Salutation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table rows will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get the data from localStorage
+            const rentedBooks = JSON.parse(localStorage.getItem('rentedBooks'));
+
+            // Get the table body element
+            const tableBody = document.getElementById('rentedBooksTable').getElementsByTagName('tbody')[0];
+
+            // Check if rentedBooks exists
+            if (rentedBooks && rentedBooks.length > 0) {
+                // Loop through the rented books and add rows to the table
+                rentedBooks.forEach(book => {
+                    const row = tableBody.insertRow();
+
+                    // Insert cells for fullname, address, movie rented, and salutation
+                    row.insertCell(0).textContent = book.fullname;
+                    row.insertCell(1).textContent = book.physical_address;
+                    row.insertCell(2).textContent = book.movie_rented;
+                    row.insertCell(3).textContent = book.salutation;
+                });
+            } else {
+                // If no data is found, display a message
+                const row = tableBody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 4;
+                cell.textContent = 'No rented books found.';
+            }
+        });
+    </script>
+</body>
+</html>
