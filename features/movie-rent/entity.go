@@ -43,7 +43,7 @@ type ServiceInterface interface {
 	InsertIntoCustomers(fullname, physicalAddress string, salutationID int) (res *Customers, err error)
 	InsertIntoMoviesList(MovieName string) (res *MoviesList, err error)
 	InsertIntoRentedMovies(input RentedMovies) (res *RentedMovies, err error)
-	// ListOfRentBook() (res *ListRentedBooks, err error)
+	ListOfRentBook() (res *[]ListRentedBooks, err error)
 }
 
 type RepositoryInterface interface {
@@ -55,4 +55,6 @@ type RepositoryInterface interface {
 	InsertIntoCustomers(fullname, physicalAddress string, salutationID int) (*Customers, error)
 	InsertIntoMoviesList(MovieName string) (*MoviesList, error)
 	InsertIntoRentedMovies(input RentedMovies) (*RentedMovies, error)
+
+	ListOfRentedmovies() (*[]ListRentedBooks, error)
 }

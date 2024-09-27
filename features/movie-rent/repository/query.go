@@ -35,7 +35,7 @@ func (r *rentRepository) ReadSalutation(title string) (res *rent.Salutations, er
 }
 
 func (r *rentRepository) ReadCustomers(fullname, physicalAddress string, salutationID int) (res *rent.Customers, err error) {
-	query := "SELECT * FROM customers WHERE fullnames = $1 AND physical_address = $2;"
+	query := "SELECT * FROM customers WHERE fullnames = $1 AND physical_address = $2"
 
 	var customers rent.Customers
 	row := r.pool.QueryRow(r.ctx, query, fullname, physicalAddress)
@@ -99,7 +99,7 @@ func (r *rentRepository) InsertIntoMoviesList(MovieName string) (*rent.MoviesLis
 }
 
 func (r *rentRepository) InsertIntoRentedMovies(input rent.RentedMovies) (*rent.RentedMovies, error) {
-	query := "INSERT INTO rented_movies(customers_id, movies_list_id) VALUES($1, $2) RETURNING"
+	query := "INSERT INTO rented_movies(customers_id, movies_list_id) VALUES($1, $2) RETURNING *"
 
 	var res rent.RentedMovies
 	row := r.pool.QueryRow(r.ctx, query, input.CustomersID, input.MoviesListID)
@@ -107,6 +107,47 @@ func (r *rentRepository) InsertIntoRentedMovies(input rent.RentedMovies) (*rent.
 	if err != nil {
 		errMsg := fmt.Errorf("failed insert into rented movie, err: %v", err)
 		return nil, errMsg
+	}
+
+	return &res, nil
+}
+
+func (r *rentRepository) ListOfRentedmovies() (*[]rent.ListRentedBooks, error) {
+	query := `
+		SELECT
+			c.fullnames AS "FULLNAMES",
+			c.physical_address AS "PHYSICAL_ADDRESS",
+			STRING_AGG(ml.movies_name, ', ' ORDER BY ml.id) AS "MOVIES_RENTED",
+			s.title AS "SALUTATION"
+		FROM
+			rented_movies rm
+		INNER JOIN
+			customers c ON rm.customers_id = c.id
+		INNER JOIN
+			movies_list ml ON rm.movies_list_id = ml.id
+		INNER JOIN
+			salutations s ON c.salutations_id = s.id
+		GROUP BY
+			c.fullnames, c.physical_address, s.title
+		ORDER BY c.fullnames ASC;
+	`
+
+	var res []rent.ListRentedBooks
+	rows, err := r.pool.Query(r.ctx, query)
+	if err != nil {
+		errMsg := fmt.Errorf("failed get list of rented movie, err: %v", err)
+		return nil, errMsg
+	}
+
+	for rows.Next() {
+		var temp rent.ListRentedBooks
+		err := rows.Scan(&temp.Fullname, &temp.PhysicalAddress, &temp.MovieRented, &temp.Salutation)
+		if err != nil {
+			errMsg := fmt.Errorf("failed get list of rented movie, err: %v", err)
+			return nil, errMsg
+		}
+
+		res = append(res, temp)
 	}
 
 	return &res, nil

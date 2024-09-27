@@ -37,6 +37,7 @@ func NewMovieRentDelivery(router *httprouter.Router, service rent.ServiceInterfa
 	handler.trans = trans
 
 	router.POST("/api/rent_book", handler.rentBook)
+	router.GET("/api/list_of_rented_books", handler.listOfRentedBook)
 }
 
 func translateError(trans ut.Translator, err error) (errTrans []string) {
@@ -74,4 +75,16 @@ func (d *movieRentDelivery) rentBook(w http.ResponseWriter, r *http.Request, _ h
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(responses.SuccessWithDataResponse(rentMovieResponse(*response), 200, "rent book success"))
+}
+
+func (d *movieRentDelivery) listOfRentedBook(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	response, err := d.service.ListOfRentBook()
+	if err != nil {
+		responses.ErrorJSON(w, 500, err.Error(), r.RemoteAddr)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(responses.SuccessWithDataResponse(response, 200, "list of rented book success"))
 }

@@ -1,9 +1,7 @@
 package service
 
 import (
-	"errors"
-	// "fmt"
-	// "log"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 
@@ -58,7 +56,7 @@ func (s *rentService) InsertIntoSalutations(title string) (res *rent.Salutations
 		return res, nil
 	}
 
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+	if !strings.Contains(err.Error(), pgx.ErrNoRows.Error()) {
 		return nil, err
 	}
 
@@ -75,7 +73,7 @@ func (s *rentService) InsertIntoCustomers(fullname, physicalAddress string, salu
 		return res, nil
 	}
 
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+	if !strings.Contains(err.Error(), pgx.ErrNoRows.Error()) {
 		return nil, err
 	}
 
@@ -92,7 +90,7 @@ func (s *rentService) InsertIntoMoviesList(MovieName string) (res *rent.MoviesLi
 		return res, nil
 	}
 
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+	if !strings.Contains(err.Error(), pgx.ErrNoRows.Error()) {
 		return nil, err
 	}
 
@@ -105,6 +103,15 @@ func (s *rentService) InsertIntoMoviesList(MovieName string) (res *rent.MoviesLi
 }
 func (s *rentService) InsertIntoRentedMovies(input rent.RentedMovies) (res *rent.RentedMovies, err error) {
 	res, err = s.repo.InsertIntoRentedMovies(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+func (s *rentService) ListOfRentBook() (res *[]rent.ListRentedBooks, err error) {
+	res, err = s.repo.ListOfRentedmovies()
 	if err != nil {
 		return nil, err
 	}
