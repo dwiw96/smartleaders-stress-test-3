@@ -2,11 +2,10 @@ package delivery
 
 import (
 	"encoding/json"
-	// "fmt"
 	"net/http"
 
-	// middleware "stress-test-3-2-go/middleware"
 	rent "stress-test-3-2-go/features/movie-rent"
+	middleware "stress-test-3-2-go/middleware"
 	responses "stress-test-3-2-go/utils/responses"
 
 	"github.com/go-playground/locales/en"
@@ -36,8 +35,8 @@ func NewMovieRentDelivery(router *httprouter.Router, service rent.ServiceInterfa
 	en_translations.RegisterDefaultTranslations(handler.validate, trans)
 	handler.trans = trans
 
-	router.POST("/api/rent_book", handler.rentBook)
-	router.GET("/api/list_of_rented_books", handler.listOfRentedBook)
+	router.POST("/api/rent_book", middleware.Cors(handler.rentBook))
+	router.GET("/api/list_of_rented_books", middleware.Cors(handler.listOfRentedBook))
 }
 
 func translateError(trans ut.Translator, err error) (errTrans []string) {

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 )
 
 func SetupRouter() *httprouter.Router {
@@ -17,6 +18,15 @@ func SetupRouter() *httprouter.Router {
 }
 
 func StartServer(port string, router *httprouter.Router) {
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // Adjust according to your needs
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		ExposedHeaders:   []string{"Authorization"},
+		AllowCredentials: true,
+	})
+	handler := c.Handler(router)
+
 	log.Println("start server at localhost", port)
-	log.Fatal(http.ListenAndServe(port, router))
+	log.Fatal(http.ListenAndServe(port, handler))
 }
